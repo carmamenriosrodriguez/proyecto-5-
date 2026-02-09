@@ -1,8 +1,8 @@
 import pandas as pd
+from pandas.io.pytables import Col
 import requests
 import re
 import time
-import functions
 
 def explorar_df(df):
     print(df.info())
@@ -32,18 +32,56 @@ def limpiar_dataset(df):
                         .str.replace('.', '', regex=False))
     df_clean.duplicated().sum()
     df_clean = df_clean.drop_duplicates()
-    df_clean = df_clean.dropna(how='all')
+    df_clean = df_clean.dropna(how='all') 
     return df_clean
 
-
-def get_api(indicador):
-    url = f"https://ghoapi.azureedge.net/api/{indicador}"
-    respuesta = re.get(url)
-    datos_json = respuesta.json()
+def categorico(df,col):
+    """Realiza un análisis descriptivo de una columna categórica."""
+    print(df[col].value_counts())
+    print(df[col].unique())
+    print(df[col].nunique())
     
-    # 3. Convertir la lista que hay en la llave 'value' a un DataFrame
-    df = pd.DataFrame(datos_json['value'])
+
+def numerico(df,col):
+    """Realiza un análisis descriptivo de una columna numérica."""
+    print(df[col].describe())
+    print(df[col].isnull().sum())
+    print(df[col].nunique())
+    
+
+def filtrar_fila(df,col,lista):
+    return df[df[col].isin(lista)]
+
+def completar_nulos(df,col,valor):
+    df[col] = df[col].fillna(valor)
     return df
+
+def estadisticos(df):
+    print(df.describe())
+    print(df.select_dtypes(include=["number"]).describe())
+    
+
+def ver_nulos(df):
+    df_con_nulos = df[df.isnull().any(axis=1)]
+    display(df_con_nulos)
+
+
+def ver_duplicados(df):
+    df_duplicados = df[df.duplicated()]
+    display(df_duplicados)
+    return df_duplicados
+
+def rango_edad(df,col):
+    """Crea rangos de edad a partir de una columna numérica."""
+    df4=df.copy()
+    bins = [0, 18, 35, 50, 65, 120]
+    labels = ['Niños(0-18)', 'Jóvenes(19-35)', 'Adultos(36-50)', 'Adultos maduros(51-65)', 'Adultos mayores(66+)']
+    
+    df4['age_group'] = pd.cut(df[col], bins=bins, labels=labels, include_lowest=True)
+    
+    return df4
+
+
 
 def iso8601_to_seconds(duration):
     """Convierte formatos tipo PT10M30S a segundos totales."""
