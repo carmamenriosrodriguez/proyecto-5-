@@ -1,5 +1,4 @@
 import pandas as pd
-from pandas.io.pytables import Col
 import requests
 import re
 import time
