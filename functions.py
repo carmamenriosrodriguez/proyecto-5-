@@ -2,6 +2,9 @@ import pandas as pd
 import requests
 import re
 import time
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def explorar_df(df):
     print(df.info())
@@ -70,17 +73,17 @@ def ver_duplicados(df):
     display(df_duplicados)
     return df_duplicados
 
+_______
+
 def rango_edad(df,col):
     """Crea rangos de edad a partir de una columna numérica."""
-    df4=df.copy()
+    df=df.copy()
     bins = [0, 18, 35, 50, 65, 120]
     labels = ['Niños(0-18)', 'Jóvenes(19-35)', 'Adultos(36-50)', 'Adultos maduros(51-65)', 'Adultos mayores(66+)']
     
-    df4['age_group'] = pd.cut(df[col], bins=bins, labels=labels, include_lowest=True)
+    df['grupo_edad'] = pd.cut(df[col], bins=bins, labels=labels, include_lowest=True)
     
     return df4
-
-
 
 def iso8601_to_seconds(duration):
     """Convierte formatos tipo PT10M30S a segundos totales."""
