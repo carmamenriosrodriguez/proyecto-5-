@@ -73,8 +73,6 @@ def ver_duplicados(df):
     display(df_duplicados)
     return df_duplicados
 
-_______
-
 def rango_edad(df,col):
     """Crea rangos de edad a partir de una columna numérica."""
     df=df.copy()
@@ -83,7 +81,26 @@ def rango_edad(df,col):
     
     df['grupo_edad'] = pd.cut(df[col], bins=bins, labels=labels, include_lowest=True)
     
-    return df4
+    return df
+
+
+def separa_fecha_hora (df,col):
+    df[col] = pd.to_datetime(df[col].str.extract(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')[0])
+    df['fecha'] = df[col].dt.date
+    df['hora'] = df[col].dt.time
+    return df
+
+def agrupar_hora(df,col):
+    """Crea grupos a partir de las horas."""
+    bins = [0, 6, 12, 18, 24]
+    labels = ['Noche(0-6)', 'Mañana(6-12)', 'Tarde(12-18)', 'Noche(18-24)']
+    
+    horas_extraidas = pd.to_datetime(df[col], format='%H:%M:%S', errors='coerce').dt.hour
+    
+    df['fecha_y_hora'] = pd.cut(horas_extraidas, bins=bins, labels=labels, include_lowest=True)
+    
+    return df
+
 
 def iso8601_to_seconds(duration):
     """Convierte formatos tipo PT10M30S a segundos totales."""
