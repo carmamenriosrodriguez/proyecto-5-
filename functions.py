@@ -5,6 +5,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy.stats.contingency import association
 
 def explorar_df(df):
     print(df.info())
@@ -97,7 +98,7 @@ def agrupar_hora(df,col):
     
     horas_extraidas = pd.to_datetime(df[col], format='%H:%M:%S', errors='coerce').dt.hour
     
-    df['fecha_y_hora'] = pd.cut(horas_extraidas, bins=bins, labels=labels, include_lowest=True)
+    df['grupo_horario'] = pd.cut(horas_extraidas, bins=bins, labels=labels, include_lowest=True)
     
     return df
 
