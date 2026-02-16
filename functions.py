@@ -94,7 +94,7 @@ def separa_fecha_hora (df,col):
 def agrupar_hora(df,col):
     """Crea grupos a partir de las horas."""
     bins = [0, 6, 12, 18, 24]
-    labels = ['Noche(0-6)', 'Mañana(6-12)', 'Tarde(12-18)', 'Noche(18-24)']
+    labels = ['Noche(0-6)', 'Mañana(6-12)', 'Mediodía(12-18)', 'Tarde(18-24)']
     
     horas_extraidas = pd.to_datetime(df[col], format='%H:%M:%S', errors='coerce').dt.hour
     
