@@ -102,6 +102,18 @@ def agrupar_hora(df,col):
     
     return df
 
+def check_normality(pasos_por_dia, group_name):
+    stat, p_value = stats.kstest(pasos_por_dia, 'norm')
+    
+    print(f"--- Grupo {group_name} ---")
+    print(f"Estadístico D: {stat}")
+    print(f"P-valor: {p_value}")
+    
+    if p_value < 0.05:
+        print("Resultado: La muestra No proviene de la ditribución teórica (Rechazamos H0)")
+    else:
+        print("Resultado: Los muestra proviene de la ditribución teórica (No rechazamos H0)")
+    print("-" * 30)
 
 def iso8601_to_seconds(duration):
     """Convierte formatos tipo PT10M30S a segundos totales."""
