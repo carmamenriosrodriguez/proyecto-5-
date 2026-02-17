@@ -68,10 +68,6 @@ El dataset presenta problemas de datos faltantes que han requerido procesos de l
 
 Se han tomado decisiones de limpieza y estandarización para garantizar la coherencia del análisis y la cantidad de datos de estudio por lo que nos hemos centrado en dos grupos de estudio: Test y Control. Además, se unificaron formatos de nombres de columnas para facilitar la manipulación y se validó la ausencia de duplicados que pudieran alterar los resultados de la prueba A/B.
 
-
----
-
-
 ## Preguntas clave / Hipótesis
 Para iniciar con el estudio antes de observar los clientes de Test y/o Control nos hicimos las siguientes preguntas: 
 - ¿Cuál es el perfil general del cliente de Vanguard? 
