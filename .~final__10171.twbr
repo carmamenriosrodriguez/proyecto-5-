@@ -12,6 +12,8 @@
     <ObjectModelEncapsulateLegacy />
     <ObjectModelExtractV2 />
     <ObjectModelTableType />
+    <ParameterAction />
+    <ParameterActionClearSelection />
     <SchemaViewerObjectModel />
     <SetMembershipControl />
     <SheetIdentifierTracking />
@@ -24,6 +26,12 @@
     <preference name='ui.shelf.height' value='26' />
   </preferences>
   <datasources>
+    <datasource hasconnection='false' inline='true' name='Parameters' version='18.1'>
+      <aliases enabled='yes' />
+      <column caption='ColorCenter' datatype='integer' name='[ColorCenter]' param-domain-type='any' role='measure' type='quantitative' value='23'>
+        <calculation class='tableau' formula='23' />
+      </column>
+    </datasource>
     <datasource caption='df_final' inline='true' name='federated.17gw7k40l3me5r11ll1541xvyloj' version='18.1'>
       <connection class='federated'>
         <named-connections>
@@ -365,6 +373,13 @@
       <aliases enabled='yes' />
       <column caption='grupo_edad' datatype='string' name='[Calculation_0056114972217344]' role='dimension' type='nominal'>
         <calculation class='tableau' formula='IF [edad] &lt;= 18 THEN &apos;Niños (0-18)&apos;&#13;&#10;ELSEIF [edad] &lt;= 35 THEN &apos;Jóvenes (19-35)&apos;&#13;&#10;ELSEIF [edad] &lt;= 50 THEN &apos;Adultos (36-50)&apos;&#13;&#10;ELSEIF [edad] &lt;= 65 THEN &apos;Adultos maduros (51-65)&apos;&#13;&#10;ELSE &apos;Adultos mayores (66+)&apos;&#13;&#10;END' />
+        <aliases>
+          <alias key='&quot;Adultos (36-50)&quot;' value='(36-50) Adultos ' />
+          <alias key='&quot;Adultos maduros (51-65)&quot;' value='(51-65) Adultos maduros ' />
+          <alias key='&quot;Adultos mayores (66+)&quot;' value='(66+) Adultos mayores ' />
+          <alias key='&quot;Jóvenes (19-35)&quot;' value='(19-35) Jóvenes' />
+          <alias key='&quot;Niños (0-18)&quot;' value='(0-18) Niños' />
+        </aliases>
       </column>
       <column caption='Tasa finalización' datatype='real' default-format='p0.0%' name='[Calculation_1977099215122432]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNTD(IF {FIXED [client_id] : MAX(IF [paso] = &apos;confirm&apos; THEN 1 ELSE 0 END)} = 1 &#10;THEN [client_id] &#10;END) &#10;/ &#10;COUNTD(IF [paso] = &apos;start&apos; THEN [client_id] END)' />
@@ -401,7 +416,6 @@
       <column-instance column='[client_id]' derivation='CountD' name='[ctd:client_id:qk]' pivot='key' type='quantitative' />
       <column-instance column='[Calculation_2326606165225482]' derivation='None' name='[none:Calculation_2326606165225482:nk]' pivot='key' type='nominal' />
       <column-instance column='[años_fidelizacion]' derivation='None' name='[none:años_fidelizacion:ok]' pivot='key' type='ordinal' />
-      <column-instance column='[cantidad_cuentas]' derivation='None' name='[none:cantidad_cuentas:nk]' pivot='key' type='nominal' />
       <column-instance column='[genero]' derivation='None' name='[none:genero:nk]' pivot='key' type='nominal' />
       <column-instance column='[grupo_hora]' derivation='None' name='[none:grupo_hora:nk]' pivot='key' type='nominal' />
       <column-instance column='[paso]' derivation='None' name='[none:paso:nk]' pivot='key' type='nominal' />
@@ -411,9 +425,19 @@
           <groupfilter function='level-members' level='[años_fidelizacion]' />
         </groupfilter>
       </group>
+      <group caption='Acción (cantidad_cuentas)' hidden='true' name='[Action (cantidad_cuentas)]' name-style='unqualified' user:auto-column='sheet_link'>
+        <groupfilter function='crossjoin'>
+          <groupfilter function='level-members' level='[cantidad_cuentas]' />
+        </groupfilter>
+      </group>
       <group caption='Acción (genero)' hidden='true' name='[Action (genero)]' name-style='unqualified' user:auto-column='sheet_link'>
         <groupfilter function='crossjoin'>
           <groupfilter function='level-members' level='[genero]' />
+        </groupfilter>
+      </group>
+      <group caption='Acción (grupo_edad)' hidden='true' name='[Action (grupo_edad)]' name-style='unqualified' user:auto-column='sheet_link'>
+        <groupfilter function='crossjoin'>
+          <groupfilter function='level-members' level='[Calculation_0056114972217344]' />
         </groupfilter>
       </group>
       <group caption='Acción (paso,tipo)' hidden='true' name='[Action (paso,tipo)]' name-style='unqualified' user:auto-column='sheet_link'>
@@ -822,29 +846,6 @@
               <bucket>&quot;True&quot;</bucket>
             </map>
           </encoding>
-          <encoding attr='color' field='[none:cantidad_cuentas:nk]' type='palette'>
-            <map to='#4e79a7'>
-              <bucket>&quot;1.0&quot;</bucket>
-            </map>
-            <map to='#59a14f'>
-              <bucket>&quot;5.0&quot;</bucket>
-            </map>
-            <map to='#76b7b2'>
-              <bucket>&quot;4.0&quot;</bucket>
-            </map>
-            <map to='#b07aa1'>
-              <bucket>&quot;7.0&quot;</bucket>
-            </map>
-            <map to='#e15759'>
-              <bucket>&quot;3.0&quot;</bucket>
-            </map>
-            <map to='#edc948'>
-              <bucket>&quot;6.0&quot;</bucket>
-            </map>
-            <map to='#f28e2b'>
-              <bucket>&quot;2.0&quot;</bucket>
-            </map>
-          </encoding>
         </style-rule>
       </style>
       <semantic-values>
@@ -889,6 +890,14 @@
     </datasource>
   </datasources>
   <actions>
+    <action caption='Filtro 2 (generado)' name='[Action3_665AC26DE7334EF48F4DBCDA64A235FD]'>
+      <activation auto-clear='true' type='on-select' />
+      <source dashboard='Dashboard 1' type='sheet' worksheet='Edad' />
+      <command command='tsc:tsl-filter'>
+        <param name='special-fields' value='all' />
+        <param name='target' value='Dashboard 1' />
+      </command>
+    </action>
     <action caption='Filtro 1 (generado)' name='[Action3_EF54D19F9F9C4D7196B900D274889327]'>
       <activation auto-clear='true' type='on-select' />
       <source dashboard='Dashboard 1' type='sheet' worksheet='Tipo' />
@@ -905,31 +914,84 @@
         <param name='target' value='Dashboard 1' />
       </command>
     </action>
+    <action caption='Filtro 4 (generado)' name='[Action4_10971F81DA3D4950AE4A9EF11ECC455A]'>
+      <activation auto-clear='true' type='on-select' />
+      <source dashboard='Dashboard 1' type='sheet' worksheet='Género' />
+      <command command='tsc:tsl-filter'>
+        <param name='special-fields' value='all' />
+        <param name='target' value='Dashboard 1' />
+      </command>
+    </action>
+    <action caption='Filtro 5 (generado)' name='[Action5_FD4E2B0D656046D69D7C33400931E7BA]'>
+      <activation auto-clear='true' type='on-select' />
+      <source dashboard='Dashboard 1' type='sheet' worksheet='Cuentas' />
+      <command command='tsc:tsl-filter'>
+        <param name='special-fields' value='all' />
+        <param name='target' value='Dashboard 1' />
+      </command>
+    </action>
+    <edit-parameter-action caption='ParameterColorCenter1' name='[Action6_43FB65CA80374E1BAEA844EDFF22381E]'>
+      <activation type='on-select' />
+      <source type='sheet' worksheet='Cuentas' />
+      <agg-type type='median' />
+      <clear-option type='do-nothing' value='i:1' />
+      <params>
+        <param name='source-field' value='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' />
+        <param name='target-parameter' value='[Parameters].[ColorCenter]' />
+      </params>
+    </edit-parameter-action>
   </actions>
   <worksheets>
     <worksheet name='Año fidelización'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Años en Vanguard</run>
+          </formatted-text>
+        </title>
+      </layout-options>
       <table>
         <view>
           <datasources>
             <datasource caption='df_final' name='federated.17gw7k40l3me5r11ll1541xvyloj' />
           </datasources>
           <datasource-dependencies datasource='federated.17gw7k40l3me5r11ll1541xvyloj'>
+            <column caption='grupo_edad' datatype='string' name='[Calculation_0056114972217344]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [edad] &lt;= 18 THEN &apos;Niños (0-18)&apos;&#13;&#10;ELSEIF [edad] &lt;= 35 THEN &apos;Jóvenes (19-35)&apos;&#13;&#10;ELSEIF [edad] &lt;= 50 THEN &apos;Adultos (36-50)&apos;&#13;&#10;ELSEIF [edad] &lt;= 65 THEN &apos;Adultos maduros (51-65)&apos;&#13;&#10;ELSE &apos;Adultos mayores (66+)&apos;&#13;&#10;END' />
+              <aliases>
+                <alias key='&quot;Adultos (36-50)&quot;' value='(36-50) Adultos ' />
+                <alias key='&quot;Adultos maduros (51-65)&quot;' value='(51-65) Adultos maduros ' />
+                <alias key='&quot;Adultos mayores (66+)&quot;' value='(66+) Adultos mayores ' />
+                <alias key='&quot;Jóvenes (19-35)&quot;' value='(19-35) Jóvenes' />
+                <alias key='&quot;Niños (0-18)&quot;' value='(0-18) Niños' />
+              </aliases>
+            </column>
             <column datatype='real' datatype-customized='true' name='[años_fidelizacion]' role='dimension' type='ordinal' />
+            <column datatype='string' name='[cantidad_cuentas]' role='dimension' type='nominal' />
             <column datatype='integer' name='[client_id]' role='measure' type='quantitative' />
             <column-instance column='[client_id]' derivation='CountD' name='[ctd:client_id:qk]' pivot='key' type='quantitative' />
+            <column datatype='real' datatype-customized='true' name='[edad]' role='dimension' type='ordinal' />
             <column datatype='string' name='[genero]' role='dimension' type='nominal' />
             <column-instance column='[años_fidelizacion]' derivation='None' name='[none:años_fidelizacion:ok]' pivot='key' type='ordinal' />
             <column datatype='string' name='[tipo]' role='dimension' type='nominal' />
           </datasource-dependencies>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]'>
+            <groupfilter function='level-members' level='[cantidad_cuentas]' user:ui-action-filter='[Action5_FD4E2B0D656046D69D7C33400931E7BA]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]'>
             <groupfilter function='level-members' level='[genero]' user:ui-action-filter='[Action2_EAA975F4B4DC49A89B63EF4A6488AB73]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]'>
+            <groupfilter function='level-members' level='[Calculation_0056114972217344]' user:ui-action-filter='[Action3_665AC26DE7334EF48F4DBCDA64A235FD]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]'>
-            <groupfilter function='member' level='[tipo]' member='&quot;Test&quot;' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+            <groupfilter function='level-members' level='[tipo]' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
           <slices>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]</column>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]</column>
           </slices>
           <aggregation value='true' />
         </view>
@@ -1003,16 +1065,34 @@
       <simple-id uuid='{6BFA1BDA-2713-48CB-B272-9C2016B1BF70}' />
     </worksheet>
     <worksheet name='Cuentas'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Cantidad de cuentas</run>
+          </formatted-text>
+        </title>
+      </layout-options>
       <table>
         <view>
           <datasources>
             <datasource caption='df_final' name='federated.17gw7k40l3me5r11ll1541xvyloj' />
           </datasources>
           <datasource-dependencies datasource='federated.17gw7k40l3me5r11ll1541xvyloj'>
+            <column caption='grupo_edad' datatype='string' name='[Calculation_0056114972217344]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [edad] &lt;= 18 THEN &apos;Niños (0-18)&apos;&#13;&#10;ELSEIF [edad] &lt;= 35 THEN &apos;Jóvenes (19-35)&apos;&#13;&#10;ELSEIF [edad] &lt;= 50 THEN &apos;Adultos (36-50)&apos;&#13;&#10;ELSEIF [edad] &lt;= 65 THEN &apos;Adultos maduros (51-65)&apos;&#13;&#10;ELSE &apos;Adultos mayores (66+)&apos;&#13;&#10;END' />
+              <aliases>
+                <alias key='&quot;Adultos (36-50)&quot;' value='(36-50) Adultos ' />
+                <alias key='&quot;Adultos maduros (51-65)&quot;' value='(51-65) Adultos maduros ' />
+                <alias key='&quot;Adultos mayores (66+)&quot;' value='(66+) Adultos mayores ' />
+                <alias key='&quot;Jóvenes (19-35)&quot;' value='(19-35) Jóvenes' />
+                <alias key='&quot;Niños (0-18)&quot;' value='(0-18) Niños' />
+              </aliases>
+            </column>
             <column datatype='real' datatype-customized='true' name='[años_fidelizacion]' role='dimension' type='ordinal' />
             <column datatype='string' name='[cantidad_cuentas]' role='dimension' type='nominal' />
             <column datatype='integer' name='[client_id]' role='measure' type='quantitative' />
             <column-instance column='[client_id]' derivation='CountD' name='[ctd:client_id:qk]' pivot='key' type='quantitative' />
+            <column datatype='real' datatype-customized='true' name='[edad]' role='dimension' type='ordinal' />
             <column datatype='string' name='[genero]' role='dimension' type='nominal' />
             <column-instance column='[cantidad_cuentas]' derivation='None' name='[none:cantidad_cuentas:nk]' pivot='key' type='nominal' />
             <column datatype='string' name='[tipo]' role='dimension' type='nominal' />
@@ -1023,13 +1103,17 @@
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]'>
             <groupfilter function='level-members' level='[genero]' user:ui-action-filter='[Action2_EAA975F4B4DC49A89B63EF4A6488AB73]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]'>
+            <groupfilter function='level-members' level='[Calculation_0056114972217344]' user:ui-action-filter='[Action3_665AC26DE7334EF48F4DBCDA64A235FD]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]'>
-            <groupfilter function='member' level='[tipo]' member='&quot;Test&quot;' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+            <groupfilter function='level-members' level='[tipo]' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
           <slices>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]</column>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]</column>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (años_fidelizacion)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]</column>
           </slices>
           <aggregation value='true' />
         </view>
@@ -1038,7 +1122,11 @@
             <format attr='display' class='0' field='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' scope='rows' value='false' />
           </style-rule>
           <style-rule element='mark'>
-            <encoding attr='color' field='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' palette='sunrise_sunset_diverging_10_0' type='interpolated' />
+            <encoding attr='color' center='15' field='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' max='1800' min='1' num-steps='16' palette='sunrise_sunset_diverging_10_0' type='interpolated' />
+            <encoding attr='size-bar' field='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' field-type='quantitative' max-size='1' min-size='0.005' type='centersize' />
+          </style-rule>
+          <style-rule element='pane'>
+            <format attr='background-color' data-class='total' value='#00000000' />
           </style-rule>
           <style-rule element='worksheet'>
             <format attr='display-field-labels' scope='cols' value='false' />
@@ -1072,12 +1160,10 @@
             <view>
               <breakdown value='auto' />
             </view>
-            <mark class='Shape' />
-            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <mark class='Square' />
             <encodings>
-              <size column='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' />
-              <text column='[federated.17gw7k40l3me5r11ll1541xvyloj].[none:cantidad_cuentas:nk]' />
-              <color column='[federated.17gw7k40l3me5r11ll1541xvyloj].[none:cantidad_cuentas:nk]' />
+              <color column='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' />
+              <text column='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
@@ -1090,12 +1176,13 @@
                 <format attr='mark-labels-mode' value='all' />
                 <format attr='mark-labels-range-scope' value='pane' />
                 <format attr='mark-labels-range-field' value='' />
-                <format attr='size' value='14.547999382019043' />
+                <format attr='has-stroke' value='false' />
+                <format attr='mark-transparency' value='255' />
               </style-rule>
             </style>
           </pane>
         </panes>
-        <rows />
+        <rows>[federated.17gw7k40l3me5r11ll1541xvyloj].[none:cantidad_cuentas:nk]</rows>
         <cols />
       </table>
       <simple-id uuid='{9D384BBC-0647-4C70-9A75-24DC6719AFD1}' />
@@ -1116,14 +1203,39 @@
             <datasource caption='df_final' name='federated.17gw7k40l3me5r11ll1541xvyloj' />
           </datasources>
           <datasource-dependencies datasource='federated.17gw7k40l3me5r11ll1541xvyloj'>
+            <column caption='grupo_edad' datatype='string' name='[Calculation_0056114972217344]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [edad] &lt;= 18 THEN &apos;Niños (0-18)&apos;&#13;&#10;ELSEIF [edad] &lt;= 35 THEN &apos;Jóvenes (19-35)&apos;&#13;&#10;ELSEIF [edad] &lt;= 50 THEN &apos;Adultos (36-50)&apos;&#13;&#10;ELSEIF [edad] &lt;= 65 THEN &apos;Adultos maduros (51-65)&apos;&#13;&#10;ELSE &apos;Adultos mayores (66+)&apos;&#13;&#10;END' />
+              <aliases>
+                <alias key='&quot;Adultos (36-50)&quot;' value='(36-50) Adultos ' />
+                <alias key='&quot;Adultos maduros (51-65)&quot;' value='(51-65) Adultos maduros ' />
+                <alias key='&quot;Adultos mayores (66+)&quot;' value='(66+) Adultos mayores ' />
+                <alias key='&quot;Jóvenes (19-35)&quot;' value='(19-35) Jóvenes' />
+                <alias key='&quot;Niños (0-18)&quot;' value='(0-18) Niños' />
+              </aliases>
+            </column>
+            <column datatype='string' name='[cantidad_cuentas]' role='dimension' type='nominal' />
+            <column datatype='real' datatype-customized='true' name='[edad]' role='dimension' type='ordinal' />
+            <column datatype='string' name='[genero]' role='dimension' type='nominal' />
             <column-instance column='[tipo]' derivation='None' name='[none:tipo:nk]' pivot='key' type='nominal' />
             <column datatype='string' name='[tipo]' role='dimension' type='nominal' />
           </datasource-dependencies>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]'>
+            <groupfilter function='level-members' level='[cantidad_cuentas]' user:ui-action-filter='[Action5_FD4E2B0D656046D69D7C33400931E7BA]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]'>
+            <groupfilter function='level-members' level='[genero]' user:ui-action-filter='[Action4_10971F81DA3D4950AE4A9EF11ECC455A]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]'>
+            <groupfilter function='level-members' level='[Calculation_0056114972217344]' user:ui-action-filter='[Action3_665AC26DE7334EF48F4DBCDA64A235FD]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]'>
-            <groupfilter function='member' level='[tipo]' member='&quot;Test&quot;' user:ui-action-filter='[Action3_EF54D19F9F9C4D7196B900D274889327]' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+            <groupfilter function='level-members' level='[tipo]' user:ui-action-filter='[Action3_EF54D19F9F9C4D7196B900D274889327]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
           <slices>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]</column>
           </slices>
           <aggregation value='true' />
         </view>
@@ -1145,6 +1257,13 @@
       <simple-id uuid='{80D00F87-6CC7-4498-AC77-8861D2ED7011}' />
     </worksheet>
     <worksheet name='Edad'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Grupo por edad</run>
+          </formatted-text>
+        </title>
+      </layout-options>
       <table>
         <view>
           <datasources>
@@ -1153,8 +1272,16 @@
           <datasource-dependencies datasource='federated.17gw7k40l3me5r11ll1541xvyloj'>
             <column caption='grupo_edad' datatype='string' name='[Calculation_0056114972217344]' role='dimension' type='nominal'>
               <calculation class='tableau' formula='IF [edad] &lt;= 18 THEN &apos;Niños (0-18)&apos;&#13;&#10;ELSEIF [edad] &lt;= 35 THEN &apos;Jóvenes (19-35)&apos;&#13;&#10;ELSEIF [edad] &lt;= 50 THEN &apos;Adultos (36-50)&apos;&#13;&#10;ELSEIF [edad] &lt;= 65 THEN &apos;Adultos maduros (51-65)&apos;&#13;&#10;ELSE &apos;Adultos mayores (66+)&apos;&#13;&#10;END' />
+              <aliases>
+                <alias key='&quot;Adultos (36-50)&quot;' value='(36-50) Adultos ' />
+                <alias key='&quot;Adultos maduros (51-65)&quot;' value='(51-65) Adultos maduros ' />
+                <alias key='&quot;Adultos mayores (66+)&quot;' value='(66+) Adultos mayores ' />
+                <alias key='&quot;Jóvenes (19-35)&quot;' value='(19-35) Jóvenes' />
+                <alias key='&quot;Niños (0-18)&quot;' value='(0-18) Niños' />
+              </aliases>
             </column>
             <column datatype='real' datatype-customized='true' name='[años_fidelizacion]' role='dimension' type='ordinal' />
+            <column datatype='string' name='[cantidad_cuentas]' role='dimension' type='nominal' />
             <column datatype='integer' name='[client_id]' role='measure' type='quantitative' />
             <column-instance column='[client_id]' derivation='CountD' name='[ctd:client_id:qk]' pivot='key' type='quantitative' />
             <column datatype='real' datatype-customized='true' name='[edad]' role='dimension' type='ordinal' />
@@ -1165,11 +1292,14 @@
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (años_fidelizacion)]'>
             <groupfilter function='level-members' level='[años_fidelizacion]' user:ui-action-filter='[Action3_F5720AB9AE33455184B091DA50C86E1A]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]'>
+            <groupfilter function='level-members' level='[cantidad_cuentas]' user:ui-action-filter='[Action5_FD4E2B0D656046D69D7C33400931E7BA]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]'>
             <groupfilter function='level-members' level='[genero]' user:ui-action-filter='[Action2_EAA975F4B4DC49A89B63EF4A6488AB73]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]'>
-            <groupfilter function='member' level='[tipo]' member='&quot;Test&quot;' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+            <groupfilter function='level-members' level='[tipo]' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
           <manual-sort column='[federated.17gw7k40l3me5r11ll1541xvyloj].[none:Calculation_0056114972217344:nk]' direction='ASC'>
             <dictionary>
@@ -1184,6 +1314,7 @@
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]</column>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]</column>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (años_fidelizacion)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]</column>
           </slices>
           <aggregation value='true' />
         </view>
@@ -1215,8 +1346,10 @@
             <customized-tooltip>
               <formatted-text>
                 <run fontcolor='#757575'>grupo:&#9;</run>
+                <run bold='true' fontcolor='#000000'><![CDATA[<[federated.17gw7k40l3me5r11ll1541xvyloj].[none:Calculation_0056114972217344:nk]>]]></run>
                 <run>Æ&#10;</run>
                 <run fontcolor='#757575'>Clientes:</run>
+                <run bold='true' fontcolor='#000000'><![CDATA[<[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]>]]></run>
               </formatted-text>
             </customized-tooltip>
             <style>
@@ -1239,9 +1372,21 @@
             <datasource caption='df_final' name='federated.17gw7k40l3me5r11ll1541xvyloj' />
           </datasources>
           <datasource-dependencies datasource='federated.17gw7k40l3me5r11ll1541xvyloj'>
+            <column caption='grupo_edad' datatype='string' name='[Calculation_0056114972217344]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [edad] &lt;= 18 THEN &apos;Niños (0-18)&apos;&#13;&#10;ELSEIF [edad] &lt;= 35 THEN &apos;Jóvenes (19-35)&apos;&#13;&#10;ELSEIF [edad] &lt;= 50 THEN &apos;Adultos (36-50)&apos;&#13;&#10;ELSEIF [edad] &lt;= 65 THEN &apos;Adultos maduros (51-65)&apos;&#13;&#10;ELSE &apos;Adultos mayores (66+)&apos;&#13;&#10;END' />
+              <aliases>
+                <alias key='&quot;Adultos (36-50)&quot;' value='(36-50) Adultos ' />
+                <alias key='&quot;Adultos maduros (51-65)&quot;' value='(51-65) Adultos maduros ' />
+                <alias key='&quot;Adultos mayores (66+)&quot;' value='(66+) Adultos mayores ' />
+                <alias key='&quot;Jóvenes (19-35)&quot;' value='(19-35) Jóvenes' />
+                <alias key='&quot;Niños (0-18)&quot;' value='(0-18) Niños' />
+              </aliases>
+            </column>
             <column datatype='real' datatype-customized='true' name='[años_fidelizacion]' role='dimension' type='ordinal' />
+            <column datatype='string' name='[cantidad_cuentas]' role='dimension' type='nominal' />
             <column datatype='integer' name='[client_id]' role='measure' type='quantitative' />
             <column-instance column='[client_id]' derivation='CountD' name='[ctd:client_id:qk]' pivot='key' type='quantitative' />
+            <column datatype='real' datatype-customized='true' name='[edad]' role='dimension' type='ordinal' />
             <column datatype='string' name='[genero]' role='dimension' type='nominal' />
             <column-instance column='[genero]' derivation='None' name='[none:genero:nk]' pivot='key' type='nominal' />
             <column datatype='string' name='[tipo]' role='dimension' type='nominal' />
@@ -1249,8 +1394,20 @@
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (años_fidelizacion)]'>
             <groupfilter function='level-members' level='[años_fidelizacion]' user:ui-action-filter='[Action3_F5720AB9AE33455184B091DA50C86E1A]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]'>
+            <groupfilter function='level-members' level='[cantidad_cuentas]' user:ui-action-filter='[Action5_FD4E2B0D656046D69D7C33400931E7BA]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]'>
+            <groupfilter function='level-members' level='[Calculation_0056114972217344]' user:ui-action-filter='[Action3_665AC26DE7334EF48F4DBCDA64A235FD]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]'>
-            <groupfilter function='member' level='[tipo]' member='&quot;Test&quot;' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+            <groupfilter function='level-members' level='[tipo]' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[none:genero:nk]'>
+            <groupfilter function='except' user:ui-domain='relevant' user:ui-enumeration='exclusive' user:ui-marker='enumerate'>
+              <groupfilter function='level-members' level='[none:genero:nk]' />
+              <groupfilter function='member' level='[none:genero:nk]' member='&quot;X&quot;' />
+            </groupfilter>
           </filter>
           <shelf-sorts>
             <shelf-sort-v2 dimension-to-sort='[federated.17gw7k40l3me5r11ll1541xvyloj].[none:genero:nk]' direction='DESC' is-on-innermost-dimension='true' measure-to-sort-by='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' shelf='columns' />
@@ -1258,6 +1415,9 @@
           <slices>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]</column>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (años_fidelizacion)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[none:genero:nk]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]</column>
           </slices>
           <aggregation value='true' />
         </view>
@@ -1411,9 +1571,36 @@
             <datasource caption='df_final' name='federated.17gw7k40l3me5r11ll1541xvyloj' />
           </datasources>
           <datasource-dependencies datasource='federated.17gw7k40l3me5r11ll1541xvyloj'>
+            <column caption='grupo_edad' datatype='string' name='[Calculation_0056114972217344]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [edad] &lt;= 18 THEN &apos;Niños (0-18)&apos;&#13;&#10;ELSEIF [edad] &lt;= 35 THEN &apos;Jóvenes (19-35)&apos;&#13;&#10;ELSEIF [edad] &lt;= 50 THEN &apos;Adultos (36-50)&apos;&#13;&#10;ELSEIF [edad] &lt;= 65 THEN &apos;Adultos maduros (51-65)&apos;&#13;&#10;ELSE &apos;Adultos mayores (66+)&apos;&#13;&#10;END' />
+              <aliases>
+                <alias key='&quot;Adultos (36-50)&quot;' value='(36-50) Adultos ' />
+                <alias key='&quot;Adultos maduros (51-65)&quot;' value='(51-65) Adultos maduros ' />
+                <alias key='&quot;Adultos mayores (66+)&quot;' value='(66+) Adultos mayores ' />
+                <alias key='&quot;Jóvenes (19-35)&quot;' value='(19-35) Jóvenes' />
+                <alias key='&quot;Niños (0-18)&quot;' value='(0-18) Niños' />
+              </aliases>
+            </column>
+            <column datatype='string' name='[cantidad_cuentas]' role='dimension' type='nominal' />
+            <column datatype='real' datatype-customized='true' name='[edad]' role='dimension' type='ordinal' />
+            <column datatype='string' name='[genero]' role='dimension' type='nominal' />
             <column-instance column='[tipo]' derivation='None' name='[none:tipo:nk]' pivot='key' type='nominal' />
             <column datatype='string' name='[tipo]' role='dimension' type='nominal' />
           </datasource-dependencies>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]'>
+            <groupfilter function='level-members' level='[cantidad_cuentas]' user:ui-action-filter='[Action5_FD4E2B0D656046D69D7C33400931E7BA]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]'>
+            <groupfilter function='level-members' level='[genero]' user:ui-action-filter='[Action4_10971F81DA3D4950AE4A9EF11ECC455A]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]'>
+            <groupfilter function='level-members' level='[Calculation_0056114972217344]' user:ui-action-filter='[Action3_665AC26DE7334EF48F4DBCDA64A235FD]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]</column>
+          </slices>
           <aggregation value='true' />
         </view>
         <style>
@@ -1465,25 +1652,45 @@
             <datasource caption='df_final' name='federated.17gw7k40l3me5r11ll1541xvyloj' />
           </datasources>
           <datasource-dependencies datasource='federated.17gw7k40l3me5r11ll1541xvyloj'>
+            <column caption='grupo_edad' datatype='string' name='[Calculation_0056114972217344]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [edad] &lt;= 18 THEN &apos;Niños (0-18)&apos;&#13;&#10;ELSEIF [edad] &lt;= 35 THEN &apos;Jóvenes (19-35)&apos;&#13;&#10;ELSEIF [edad] &lt;= 50 THEN &apos;Adultos (36-50)&apos;&#13;&#10;ELSEIF [edad] &lt;= 65 THEN &apos;Adultos maduros (51-65)&apos;&#13;&#10;ELSE &apos;Adultos mayores (66+)&apos;&#13;&#10;END' />
+              <aliases>
+                <alias key='&quot;Adultos (36-50)&quot;' value='(36-50) Adultos ' />
+                <alias key='&quot;Adultos maduros (51-65)&quot;' value='(51-65) Adultos maduros ' />
+                <alias key='&quot;Adultos mayores (66+)&quot;' value='(66+) Adultos mayores ' />
+                <alias key='&quot;Jóvenes (19-35)&quot;' value='(19-35) Jóvenes' />
+                <alias key='&quot;Niños (0-18)&quot;' value='(0-18) Niños' />
+              </aliases>
+            </column>
             <column datatype='real' datatype-customized='true' name='[años_fidelizacion]' role='dimension' type='ordinal' />
+            <column datatype='string' name='[cantidad_cuentas]' role='dimension' type='nominal' />
             <column datatype='integer' name='[client_id]' role='measure' type='quantitative' />
             <column-instance column='[client_id]' derivation='CountD' name='[ctd:client_id:qk]' pivot='key' type='quantitative' />
+            <column datatype='real' datatype-customized='true' name='[edad]' role='dimension' type='ordinal' />
             <column datatype='string' name='[genero]' role='dimension' type='nominal' />
             <column datatype='string' name='[tipo]' role='dimension' type='nominal' />
           </datasource-dependencies>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (años_fidelizacion)]'>
             <groupfilter function='level-members' level='[años_fidelizacion]' user:ui-action-filter='[Action3_F5720AB9AE33455184B091DA50C86E1A]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]'>
+            <groupfilter function='level-members' level='[cantidad_cuentas]' user:ui-action-filter='[Action5_FD4E2B0D656046D69D7C33400931E7BA]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]'>
             <groupfilter function='level-members' level='[genero]' user:ui-action-filter='[Action2_EAA975F4B4DC49A89B63EF4A6488AB73]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
+          <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]'>
+            <groupfilter function='level-members' level='[Calculation_0056114972217344]' user:ui-action-filter='[Action3_665AC26DE7334EF48F4DBCDA64A235FD]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
           <filter class='categorical' column='[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]'>
-            <groupfilter function='member' level='[tipo]' member='&quot;Test&quot;' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+            <groupfilter function='level-members' level='[tipo]' user:ui-action-filter='[Action3_765C0434C3444ECA93C121286C3EC305]' user:ui-enumeration='all' user:ui-marker='enumerate' />
           </filter>
           <slices>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (genero)]</column>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (tipo)]</column>
             <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (años_fidelizacion)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (grupo_edad)]</column>
+            <column>[federated.17gw7k40l3me5r11ll1541xvyloj].[Action (cantidad_cuentas)]</column>
           </slices>
           <aggregation value='true' />
         </view>
@@ -1541,12 +1748,12 @@
   <dashboards>
     <dashboard enable-sort-zone-taborder='true' name='Dashboard 1'>
       <style />
-      <size maxheight='860' maxwidth='650' minheight='560' minwidth='420' />
+      <size maxheight='1100' maxwidth='1100' sizing-mode='range' />
       <zones>
         <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
-          <zone h='93141' id='11' param='horz' type-v2='layout-flow' w='97538' x='1231' y='5929'>
-            <zone h='93141' id='9' type-v2='layout-basic' w='65384' x='1231' y='5929'>
-              <zone h='9024' id='5' name='Total de clientes' w='65384' x='1231' y='5929'>
+          <zone h='93527' id='11' param='horz' type-v2='layout-flow' w='98504' x='748' y='5746'>
+            <zone h='93527' id='9' type-v2='layout-basic' w='79065' x='748' y='5746'>
+              <zone h='10775' id='5' name='Total de clientes' w='79065' x='748' y='5746'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='none' />
@@ -1554,7 +1761,7 @@
                   <format attr='margin' value='4' />
                 </zone-style>
               </zone>
-              <zone h='23285' id='6' name='Cuentas' w='65384' x='1231' y='52498'>
+              <zone h='23382' id='6' name='Cuentas' w='79065' x='748' y='52508'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='none' />
@@ -1562,7 +1769,7 @@
                   <format attr='margin' value='4' />
                 </zone-style>
               </zone>
-              <zone h='23287' id='7' name='Edad' w='65384' x='1231' y='75783'>
+              <zone h='23383' id='7' name='Edad' w='79065' x='748' y='75890'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='none' />
@@ -1570,7 +1777,7 @@
                   <format attr='margin' value='4' />
                 </zone-style>
               </zone>
-              <zone h='37545' id='8' name='Año fidelización' w='65384' x='1231' y='14953'>
+              <zone h='35987' id='8' name='Año fidelización' w='79065' x='748' y='16521'>
                 <zone-style>
                   <format attr='border-color' value='#000000' />
                   <format attr='border-style' value='none' />
@@ -1579,10 +1786,10 @@
                 </zone-style>
               </zone>
             </zone>
-            <zone fixed-size='209' h='93141' id='13' is-fixed='true' type-v2='layout-basic' w='32154' x='66615' y='5929'>
-              <zone h='23342' id='16' is-fixed='true' type-v2='layout-basic' w='32154' x='66615' y='5929'>
-                <zone h='14408' id='10' param='vert' type-v2='layout-flow' w='32154' x='66615' y='5929'>
-                  <zone h='14408' id='15' name='Tipo' w='32154' x='66615' y='5929'>
+            <zone fixed-size='208' h='93527' id='13' is-fixed='true' type-v2='layout-basic' w='19439' x='79813' y='5746'>
+              <zone h='23439' id='16' is-fixed='true' type-v2='layout-basic' w='19439' x='79813' y='5746'>
+                <zone h='14467' id='10' param='vert' type-v2='layout-flow' w='19439' x='79813' y='5746'>
+                  <zone h='14467' id='15' name='Tipo' w='19439' x='79813' y='5746'>
                     <layout-cache cell-count-h='1' non-cell-size-h='43' type-h='cell' type-w='fixed' />
                     <zone-style>
                       <format attr='border-color' value='#000000' />
@@ -1592,8 +1799,8 @@
                     </zone-style>
                   </zone>
                 </zone>
-                <zone h='8934' id='17' param='vert' type-v2='layout-flow' w='32154' x='66615' y='20337'>
-                  <zone fixed-size='81' h='8934' id='12' is-fixed='true' name='Año fidelización' pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' type-v2='color' w='32154' x='66615' y='20337'>
+                <zone h='8972' id='17' param='vert' type-v2='layout-flow' w='19439' x='79813' y='20213'>
+                  <zone fixed-size='81' h='8091' id='12' is-fixed='true' name='Año fidelización' pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' type-v2='color' w='19439' x='79813' y='20213'>
                     <zone-style>
                       <format attr='border-color' value='#000000' />
                       <format attr='border-style' value='none' />
@@ -1603,8 +1810,8 @@
                   </zone>
                 </zone>
               </zone>
-              <zone h='69799' id='14' param='vert' type-v2='layout-flow' w='32154' x='66615' y='29271'>
-                <zone h='69799' id='3' name='Género' w='32154' x='66615' y='29271'>
+              <zone h='70088' id='14' param='vert' type-v2='layout-flow' w='19439' x='79813' y='29185'>
+                <zone h='70088' id='3' name='Género' w='19439' x='79813' y='29185'>
                   <layout-cache cell-count-w='4' minheight='164' type-h='scalable' type-w='cell' />
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -1616,7 +1823,7 @@
               </zone>
             </zone>
           </zone>
-          <zone h='4999' id='20' name='Dinamico' w='97538' x='1231' y='930'>
+          <zone h='5019' id='20' name='Dinamico' w='98504' x='748' y='727'>
             <zone-style>
               <format attr='border-color' value='#000000' />
               <format attr='border-style' value='none' />
@@ -1634,11 +1841,11 @@
       </zones>
       <devicelayouts>
         <devicelayout auto-generated='true' name='Phone'>
-          <size maxheight='1300' minheight='1300' sizing-mode='vscroll' />
+          <size maxheight='1500' minheight='1500' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='24' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98140' id='23' param='vert' type-v2='layout-flow' w='97538' x='1231' y='930'>
-                <zone fixed-size='35' h='5000' id='20' is-fixed='true' name='Dinamico' w='97538' x='1231' y='930'>
+            <zone h='100000' id='26' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98004' id='25' param='vert' type-v2='layout-flow' w='98546' x='727' y='998'>
+                <zone fixed-size='47' h='4992' id='20' is-fixed='true' name='Dinamico' w='98546' x='727' y='998'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -1647,7 +1854,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='70' h='9025' id='5' is-fixed='true' name='Total de clientes' w='65384' x='1231' y='5930'>
+                <zone fixed-size='110' h='10716' id='5' is-fixed='true' name='Total de clientes' w='79637' x='727' y='5990'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -1656,8 +1863,8 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='116' h='14410' id='15' is-fixed='true' name='Tipo' w='32154' x='66615' y='5930'>
-                  <layout-cache cell-count-h='1' non-cell-size-h='43' type-h='cell' type-w='fixed' />
+                <zone fixed-size='150' h='14388' id='15' is-fixed='true' name='Tipo' w='18909' x='80364' y='5990'>
+                  <layout-cache cell-count-h='1' non-cell-size-h='50' type-h='cell' type-w='fixed' />
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -1666,7 +1873,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='280' h='37545' id='8' is-fixed='true' name='Año fidelización' w='65384' x='1231' y='14955'>
+                <zone fixed-size='280' h='35789' id='8' is-fixed='true' name='Año fidelización' w='79637' x='727' y='16706'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -1675,7 +1882,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='81' h='8933' id='12' name='Año fidelización' pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' type-v2='color' w='32154' x='66615' y='20340'>
+                <zone fixed-size='81' h='8922' id='12' name='Año fidelización' pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' type-v2='color' w='18909' x='80364' y='20378'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -1684,8 +1891,8 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='280' h='69797' id='3' is-fixed='true' name='Género' w='32154' x='66615' y='29273'>
-                  <layout-cache cell-count-w='4' minheight='164' type-h='scalable' type-w='cell' />
+                <zone fixed-size='280' h='69702' id='3' is-fixed='true' name='Género' w='18909' x='80364' y='29300'>
+                  <layout-cache cell-count-w='4' minheight='175' type-h='scalable' type-w='cell' />
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -1694,7 +1901,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='193' h='23285' id='6' is-fixed='true' name='Cuentas' w='65384' x='1231' y='52500'>
+                <zone fixed-size='248' h='23253' id='6' is-fixed='true' name='Cuentas' w='79637' x='727' y='52495'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -1703,7 +1910,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='192' h='23285' id='7' is-fixed='true' name='Edad' w='65384' x='1231' y='75785'>
+                <zone fixed-size='248' h='23254' id='7' is-fixed='true' name='Edad' w='79637' x='727' y='75748'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -1726,8 +1933,58 @@
       <simple-id uuid='{DC9FE79A-011A-47E2-BA5B-619357C1A936}' />
     </dashboard>
   </dashboards>
-  <windows source-height='30'>
-    <window class='worksheet' name='Año fidelización'>
+  <windows source-height='37'>
+    <window class='dashboard' maximized='true' name='Dashboard 1'>
+      <viewpoints>
+        <viewpoint name='Año fidelización'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Cuentas'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Dinamico'>
+          <zoom type='fit-width' />
+        </viewpoint>
+        <viewpoint name='Edad'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Género'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Tipo'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Total de clientes'>
+          <zoom type='entire-view' />
+        </viewpoint>
+      </viewpoints>
+      <active id='20' />
+      <simple-id uuid='{1AF7A68B-B523-4138-B2AC-38DB147A0839}' />
+    </window>
+    <window class='worksheet' name='Hoja 7'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{6A087BD0-8891-49A9-AB95-D5682A526FE8}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Año fidelización'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1755,7 +2012,7 @@
       </cards>
       <simple-id uuid='{463DB4E0-06C3-4CE7-A0CC-7363E4FE6153}' />
     </window>
-    <window class='worksheet' name='Edad'>
+    <window class='worksheet' hidden='true' name='Cuentas'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1776,170 +2033,14 @@
           </strip>
         </edge>
         <edge name='right'>
-          <strip size='175'>
+          <strip size='172'>
             <card pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' type='color' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{0A029561-7281-4AAD-BF00-06D9AA57BE8A}' />
-    </window>
-    <window class='worksheet' name='Cuentas'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='title' />
-          </strip>
-        </edge>
-        <edge name='right'>
-          <strip size='175'>
-            <card pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[none:cantidad_cuentas:nk]' type='color' />
-            <card pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' type='size' />
           </strip>
         </edge>
       </cards>
       <simple-id uuid='{88CF7C03-7DCF-4110-AAE3-5760AB71DCBE}' />
     </window>
-    <window class='worksheet' name='Total de clientes'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='title' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{8547FABB-6F7D-4DBE-9705-9BADA600A5BF}' />
-    </window>
-    <window class='worksheet' name='Género'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='title' />
-          </strip>
-        </edge>
-        <edge name='right'>
-          <strip size='175'>
-            <card pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[none:genero:nk]' type='color' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{42AF146E-270C-4128-8ED0-C36CFB21A24C}' />
-    </window>
-    <window class='worksheet' name='Tipo'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='title' />
-          </strip>
-        </edge>
-        <edge name='right'>
-          <strip size='174'>
-            <card AVG='true' KURTOSIS='false' MAX='true' MEDIAN='true' MIN='true' QUART1='false' QUART3='false' SKEWNESS='false' STDEV='false' SUM='true' type='summary' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{D1CFE4F3-E181-4312-8693-5EE7A0CF6132}' />
-    </window>
-    <window class='worksheet' name='Hoja 7'>
-      <cards>
-        <edge name='left'>
-          <strip size='160'>
-            <card type='pages' />
-            <card type='filters' />
-            <card type='marks' />
-          </strip>
-        </edge>
-        <edge name='top'>
-          <strip size='2147483647'>
-            <card type='columns' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='rows' />
-          </strip>
-          <strip size='2147483647'>
-            <card type='title' />
-          </strip>
-        </edge>
-      </cards>
-      <simple-id uuid='{6A087BD0-8891-49A9-AB95-D5682A526FE8}' />
-    </window>
-    <window class='dashboard' maximized='true' name='Dashboard 1'>
-      <viewpoints>
-        <viewpoint name='Año fidelización' />
-        <viewpoint name='Cuentas'>
-          <zoom type='entire-view' />
-        </viewpoint>
-        <viewpoint name='Dinamico'>
-          <zoom type='fit-width' />
-        </viewpoint>
-        <viewpoint name='Edad'>
-          <zoom type='entire-view' />
-        </viewpoint>
-        <viewpoint name='Género'>
-          <zoom type='entire-view' />
-        </viewpoint>
-        <viewpoint name='Tipo'>
-          <zoom type='entire-view' />
-        </viewpoint>
-        <viewpoint name='Total de clientes'>
-          <zoom type='entire-view' />
-        </viewpoint>
-      </viewpoints>
-      <active id='15' />
-      <simple-id uuid='{1AF7A68B-B523-4138-B2AC-38DB147A0839}' />
-    </window>
-    <window class='worksheet' name='Dinamico'>
+    <window class='worksheet' hidden='true' name='Dinamico'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1961,6 +2062,113 @@
         </edge>
       </cards>
       <simple-id uuid='{76F12B62-995A-45CD-BEFD-D45EFCFEE161}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Edad'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='173'>
+            <card pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[ctd:client_id:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{0A029561-7281-4AAD-BF00-06D9AA57BE8A}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Género'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='174'>
+            <card pane-specification-id='0' param='[federated.17gw7k40l3me5r11ll1541xvyloj].[none:genero:nk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{42AF146E-270C-4128-8ED0-C36CFB21A24C}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Tipo'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='173'>
+            <card AVG='true' KURTOSIS='false' MAX='true' MEDIAN='true' MIN='true' QUART1='false' QUART3='false' SKEWNESS='false' STDEV='false' SUM='true' type='summary' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{D1CFE4F3-E181-4312-8693-5EE7A0CF6132}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Total de clientes'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{8547FABB-6F7D-4DBE-9705-9BADA600A5BF}' />
     </window>
   </windows>
 </workbook>

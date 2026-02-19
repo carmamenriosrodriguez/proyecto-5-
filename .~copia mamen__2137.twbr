@@ -370,9 +370,6 @@
       <column caption='Tasa finalización' datatype='real' default-format='p0.0%' name='[Calculation_1977099215122432]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNTD(IF [Calculation_2326606137831431] = TRUE THEN [client_id] END) &#10;/ &#10;COUNTD([client_id])' />
       </column>
-      <column caption='Tasa de error' datatype='real' name='[Calculation_2008091711901697]' role='measure' type='quantitative'>
-        <calculation class='tableau' formula='1 - (&#10;COUNTD(IF [Calculation_2326606137831431] = True THEN [client_id] END) / &#10;COUNTD(IF [Calculation_2326606136999942] = True THEN [client_id] END)&#10;)' />
-      </column>
       <column caption='Total interacciones' datatype='integer' name='[Calculation_2008091714007042]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='COUNT([visit_id])' />
       </column>
@@ -1104,24 +1101,7 @@
     <worksheet name='Hoja 5'>
       <table>
         <view>
-          <datasources>
-            <datasource caption='df_final' name='federated.17gw7k40l3me5r11ll1541xvyloj' />
-          </datasources>
-          <datasource-dependencies datasource='federated.17gw7k40l3me5r11ll1541xvyloj'>
-            <column caption='Tasa de error' datatype='real' name='[Calculation_2008091711901697]' role='measure' type='quantitative'>
-              <calculation class='tableau' formula='1 - (&#10;COUNTD(IF [Calculation_2326606137831431] = True THEN [client_id] END) / &#10;COUNTD(IF [Calculation_2326606136999942] = True THEN [client_id] END)&#10;)' />
-            </column>
-            <column caption='hizo_star' datatype='boolean' name='[Calculation_2326606136999942]' role='dimension' type='nominal'>
-              <calculation class='tableau' formula='{ FIXED [client_id], [fecha] : MAX(IF [paso] = &apos;start&apos; THEN TRUE ELSE FALSE END) }' />
-            </column>
-            <column caption='hizo_confirm' datatype='boolean' name='[Calculation_2326606137831431]' role='dimension' type='nominal'>
-              <calculation class='tableau' formula='{ FIXED [client_id], [fecha] : MAX(IF [paso] = &apos;confirm&apos; THEN TRUE ELSE FALSE END) }' />
-            </column>
-            <column datatype='integer' name='[client_id]' role='measure' type='quantitative' />
-            <column datatype='date' name='[fecha]' role='dimension' type='ordinal' />
-            <column caption='Paso' datatype='string' name='[paso]' role='dimension' type='nominal' />
-            <column-instance column='[Calculation_2008091711901697]' derivation='User' name='[usr:Calculation_2008091711901697:qk]' pivot='key' type='quantitative' />
-          </datasource-dependencies>
+          <datasources />
           <aggregation value='true' />
         </view>
         <style />
@@ -1138,7 +1118,7 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.17gw7k40l3me5r11ll1541xvyloj].[usr:Calculation_2008091711901697:qk]</rows>
+        <rows />
         <cols />
       </table>
       <simple-id uuid='{4A634866-61E1-4874-8290-9556E336F094}' />
@@ -1379,7 +1359,7 @@
       </viewpoint>
       <simple-id uuid='{F478C2E0-B1AE-4566-A4EF-9D619A855D71}' />
     </window>
-    <window class='worksheet' name='Tiempo en cada paso '>
+    <window class='worksheet' maximized='true' name='Tiempo en cada paso '>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1402,7 +1382,7 @@
       </cards>
       <simple-id uuid='{8C9037B7-BA27-4BF6-85BA-75C0B3B16373}' />
     </window>
-    <window class='worksheet' maximized='true' name='Hoja 5'>
+    <window class='worksheet' name='Hoja 5'>
       <cards>
         <edge name='left'>
           <strip size='160'>
